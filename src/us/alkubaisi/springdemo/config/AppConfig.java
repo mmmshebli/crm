@@ -21,16 +21,12 @@ import org.springframework.web.servlet.view.JstlView;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
-import us.alkubaisi.test.Test;
-import us.alkubaisi.test.TestImpl;
-import us.alkubaisi.test.TestService;
-import us.alkubaisi.test.TestServiceImpl;
 
 @EnableWebMvc
 @Configuration
 @EnableTransactionManagement
 @PropertySource({ "classpath:persistence-mysql.properties" })
-@ComponentScan("us.alkubaisi.*")
+@ComponentScan("us.alkubaisi.springdemo.*")
 public class AppConfig extends WebMvcConfigurerAdapter{
 	
 	@Autowired
@@ -48,26 +44,16 @@ public class AppConfig extends WebMvcConfigurerAdapter{
 
 	
 	@Bean
-	public Test testImpl(){
-		return new TestImpl();
-	}
-	
-	@Bean TestService testServiceImpl(){
-		return new TestServiceImpl();
-	}
-	
-	
-	@Bean
 	public ComboPooledDataSource myDataSource(){
 		ComboPooledDataSource myDataSource = new ComboPooledDataSource();
 		try {
-			myDataSource.setDriverClass("com.mysql.jdbc.Driver");
+			myDataSource.setDriverClass(env.getProperty("driver"));
 		} catch (PropertyVetoException e) {
 			e.printStackTrace();
 		}
-		myDataSource.setJdbcUrl("jdbc:mysql://localhost:3306/web_customer_tracker?useSSL=false");
-		myDataSource.setUser("springstudent");
-		myDataSource.setPassword("springstudent");
+		myDataSource.setJdbcUrl(env.getProperty("jdbcUrl"));
+		myDataSource.setUser(env.getProperty("user"));
+		myDataSource.setPassword(env.getProperty("password"));
 		myDataSource.setMinPoolSize(5);
 		myDataSource.setMaxPoolSize(20);
 		myDataSource.setMaxIdleTime(30000);

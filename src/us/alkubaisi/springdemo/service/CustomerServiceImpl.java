@@ -12,6 +12,7 @@ import us.alkubaisi.springdemo.entity.Customer;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
+	// need to inject customer dao
 	@Autowired
 	private CustomerDAO customerDAO;
 	
@@ -23,21 +24,41 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	@Transactional
-	public void saveCustomer(Customer customer) {
-		customerDAO.saveCustomer(customer);
+	public void saveCustomer(Customer theCustomer) {
+
+		customerDAO.saveCustomer(theCustomer);
 	}
 
 	@Override
 	@Transactional
-	public Customer getCustomer(int id) {
-		Customer customer = customerDAO.getCustomer(id);
-		return customer;
+	public Customer getCustomer(int theId) {
+		
+		return customerDAO.getCustomer(theId);
 	}
 
 	@Override
 	@Transactional
-	public void deleteCustomer(int id) {
-		customerDAO.deleteCustomer(id);
+	public void deleteCustomer(int theId) {
+		
+		customerDAO.deleteCustomer(theId);
 	}
 
+	@Override
+	@Transactional
+	public List<Customer> getCustomersByPage(int pageNumber) {
+		List<Customer> customers = customerDAO.getCustomersByPage(pageNumber);
+		return customers;
+	}
+
+	@Override
+	@Transactional
+	public int getCustomersCount() {
+		int count = customerDAO.getCustomersCount();
+		return count;
+	}
 }
+
+
+
+
+

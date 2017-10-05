@@ -45,3 +45,13 @@ tr:nth-child(odd) {background: #BBBBBB}
 	margin-bottom: 15px;
 	background: #cccccc;
 }
+
+.selected-page {
+	border: 2px solid black;
+}
+
+a.disabled {
+   pointer-events: none;
+   cursor: default;
+   color:gray;
+}

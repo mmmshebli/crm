@@ -6,45 +6,104 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import us.alkubaisi.springdemo.entity.Customer;
 
 @Repository
 public class CustomerDAOImpl implements CustomerDAO {
 
+	// need to inject the session factory
 	@Autowired
 	private SessionFactory sessionFactory;
 	
+	@Autowired
+	private Environment env;
+			
 	@Override
 	public List<Customer> getCustomers() {
-		Session session = sessionFactory.getCurrentSession();
-		Query<Customer> query = session.createQuery("from Customer order by lastName", Customer.class);
+		
+		// get the current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+				
+		// create a query  ... sort by last name
+		Query<Customer> theQuery = 
+				currentSession.createQuery("from Customer order by lastName",
+											Customer.class);
+		
+		// execute query and get result list
+		List<Customer> customers = theQuery.getResultList();
+				
+		// return the results		
+		return customers;
+	}
+
+	@Override
+	public void saveCustomer(Customer theCustomer) {
+
+		// get current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+		
+		// save/upate the customer ... finally LOL
+		currentSession.saveOrUpdate(theCustomer);
+		
+	}
+
+	@Override
+	public Customer getCustomer(int theId) {
+
+		// get the current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+		
+		// now retrieve/read from database using the primary key
+		Customer theCustomer = currentSession.get(Customer.class, theId);
+		
+		return theCustomer;
+	}
+
+	@Override
+	public void deleteCustomer(int theId) {
+
+		// get the current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+		
+		// delete object with primary key
+		Query theQuery = 
+				currentSession.createQuery("delete from Customer where id=:customerId");
+		theQuery.setParameter("customerId", theId);
+		
+		theQuery.executeUpdate();		
+	}
+
+	@Override
+	public List<Customer> getCustomersByPage(int pageNumber) {
+		int pageSize = Integer.parseInt(env.getProperty("pageSize"));
+		Session currentSession = sessionFactory.getCurrentSession();
+		Query<Customer> query = currentSession.createQuery("From Customer order by lastName");
+		query.setFirstResult((pageNumber-1) * pageSize);
+		query.setMaxResults(pageSize);
 		List<Customer> customers = query.getResultList();
 		return customers;
 	}
 
 	@Override
-	public void saveCustomer(Customer customer) {
-		Session session = sessionFactory.getCurrentSession();
-		//session.save(customer);
-		session.saveOrUpdate(customer);
-	}
-
-	@Override
-	public Customer getCustomer(int id) {
-		Session session = sessionFactory.getCurrentSession();
-		Customer customer = session.get(Customer.class, id);
-		return customer;
-	}
-
-	@Override
-	public void deleteCustomer(int id) {
-		Session session = sessionFactory.getCurrentSession();
-		Query query = session.createQuery("delete from Customer where id=:customerId");
-		query.setParameter("customerId", id);
-		query.executeUpdate();
+	public int getCustomersCount() {
+		Session currentSession = sessionFactory.getCurrentSession();
+		Query countQuery = currentSession.createQuery("Select count(*) from Customer");
+		int count = ((Long) countQuery.getSingleResult()).intValue();
+		return count;
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
